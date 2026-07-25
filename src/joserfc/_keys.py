@@ -170,11 +170,10 @@ class KeySet:
             # RFC 7517, Section 5: ignore a key whose "kty" is not understood
             # rather than failing the whole set (for example a post-quantum key
             # published alongside classical ones).
-            if isinstance(data, dict):
-                kty = data.get("kty")
-                if kty is not None and kty not in cls.registry_cls.key_types:
-                    continue
-            keys.append(cls.registry_cls.import_key(data, parameters=parameters))
+            try:
+                keys.append(cls.registry_cls.import_key(data, parameters=parameters))
+            except InvalidKeyTypeError:
+                continue
 
         if not keys:
             raise MissingKeyError("No keys to import")
